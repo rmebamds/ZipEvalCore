@@ -8,10 +8,13 @@ import java.util.regex.Pattern;
 
 public class ZipRange {
 
+    private Integer upperBound;
+    private Integer lowerBound;
+
     /**
      * Valid regex for string form of zip range
      */
-    private static final String VALID_STRING_INPUT_REGEX = "\\[\\d{5},\\d{5}\\]";
+    private static final String VALID_STRING_INPUT_REGEX = "\\s*\\[\\s*\\d{5}\\s*,\\s*\\d{5}\\s*\\]\\s*";
     private static final Pattern VALID_STRING_PATTERN = Pattern.compile(VALID_STRING_INPUT_REGEX);
 
     public static Comparator<ZipRange> LOWER_BOUND_COMPARATOR = new Comparator<ZipRange>() {
@@ -20,18 +23,15 @@ public class ZipRange {
         }
     };
 
-    private Integer upperBound;
-    private Integer lowerBound;
-
     /**
-     * @param stringInput - in the format "\\s*[{1}\\d+,{1}\\d+]{1}\\s*"
-     * @throws Exception
+     * @param stringInput - in the format described by VALID_STRING_INPUT_REGEX
+     * @throws ZipRangeInstantiationException
      */
     public ZipRange(String stringInput) throws ZipRangeInstantiationException {
         if(Strings.isNullOrEmpty(stringInput) || !VALID_STRING_PATTERN.matcher(stringInput.trim()).matches()) {
             throw new ZipRangeInstantiationException("Invalid String formatted input to ZipRange constructor");
         }
-        stringInput = stringInput.trim().replaceAll("\\]|\\[","");
+        stringInput = stringInput.replaceAll("\\]|\\[|\\s*","");
         String[] strParts = stringInput.split(",");
 
         assert(strParts.length == 2);
@@ -39,13 +39,18 @@ public class ZipRange {
         Integer lower = Integer.valueOf(strParts[0]);
         Integer upper = Integer.valueOf(strParts[1]);
 
-        if(lower == null || upper == null || lower > upper) {
+        if(lower > upper) {
             throw new ZipRangeInstantiationException("Invalid input to ZipRange constructor");
         }
         this.upperBound = upper;
         this.lowerBound = lower;
     }
 
+    /**
+     * Copy Constructor
+     * @param zipRange
+     * @throws ZipRangeInstantiationException
+     */
     public ZipRange(ZipRange zipRange) throws ZipRangeInstantiationException {
         if(zipRange.getLowerBound() == null || zipRange.getUpperBound() == null || zipRange.getUpperBound() < zipRange.getLowerBound()) {
             throw new ZipRangeInstantiationException("Invalid input to ZipRange copy constructor");
@@ -54,6 +59,12 @@ public class ZipRange {
         this.upperBound = zipRange.getUpperBound();
     }
 
+    /**
+     *
+     * @param lower
+     * @param upper
+     * @throws ZipRangeInstantiationException
+     */
     public ZipRange(Integer lower, Integer upper) throws ZipRangeInstantiationException {
 
         if(lower == null || upper == null || lower > upper) {
@@ -64,32 +75,23 @@ public class ZipRange {
     }
 
     /**
-     * Testing for the case that thatRange is containedWithin this range
-     //enumerating cases
-
-     //this range: [10,15]
-     //that: [1,20] -- all outside
-     //that: [11,12] -- all inside
-     //that: [11,16] -- lower inside, outside extends
-     //that: [6,12] -- that lower low, upper inside
-
-     //cannot be combined if that upper is lower than this lower, or that lower is higher than this upper
-     //that: [1,2]
-     //that: [20,25]
+     * Testing for the case that thatRange canCombine this range
+     * see tests for enumeration of cases
      * @param thatRange
      * @return
      */
-    public boolean containedWithin(ZipRange thatRange) {
+    public boolean canCombine(ZipRange thatRange) {
         return thatRange.getUpperBound() >= this.getLowerBound() && thatRange.getLowerBound() <= this.getUpperBound();
     }
 
     /**
      * Combines ranges that are contained within each other
+     * Expectation is that you call containedWithin first before you call this
      * @param thatRange
      * @throws Exception
      */
     public ZipRange combine(ZipRange thatRange) throws Exception {
-        if(!this.containedWithin(thatRange)) {
+        if(!this.canCombine(thatRange)) {
             throw new Exception("Invalid argument to combine, range not contained inside instance");
         }
 

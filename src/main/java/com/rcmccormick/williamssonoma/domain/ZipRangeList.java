@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 
 public class ZipRangeList {
 
-    private List<ZipRange> zipRangeList = new ArrayList<ZipRange>();
+    private List<ZipRange> zipRangeList = new ArrayList<>();
 
     public ZipRangeList() {}
 
@@ -56,7 +56,7 @@ public class ZipRangeList {
             }
 
             //sorting guarantees we only have to combine once, instead of all permutations
-            Collections.sort(this.zipRangeList, ZipRange.LOWER_BOUND_COMPARATOR);
+            this.zipRangeList.sort(ZipRange.LOWER_BOUND_COMPARATOR);
         }
         catch(Exception e) {
             throw new Exception("Invalid input to ZipRangeList constructor");
@@ -65,49 +65,50 @@ public class ZipRangeList {
 
     /**
      * Combine all internal ZipRanges into the equivalence class of zip ranges
-     * is not destructive
+     *  not destructive or mutative
      * @return - new copy of resulting list which is subset of this.zipRangeList
      */
-    public ZipRangeList combine() {
-        final ZipRangeList newZipRangeList = new ZipRangeList();
-
-        ZipRangeList copiedList = new ZipRangeList(this);
+    public ZipRangeList combine() throws Exception {
+        
+        final ZipRangeList returnZipRangeList = new ZipRangeList();
 
         ZipRange lastCombined = null;
         for(int i = 0 ; i < this.zipRangeList.size() ; i++) {
             if(i + 1 < this.zipRangeList.size()) {
-                ZipRange thisRange = lastCombined == null ? copiedList.getZipRangeList().get(i) : lastCombined;
-                ZipRange thatRange = copiedList.getZipRangeList().get(i + 1);
-                if(thisRange.containedWithin(thatRange)) {
+                final ZipRange thisRange = lastCombined == null ? this.zipRangeList.get(i) : lastCombined;
+                final ZipRange thatRange = this.zipRangeList.get(i + 1);
+                if(thisRange.canCombine(thatRange)) {
                     try {
                         lastCombined = thisRange.combine(thatRange);
                     }
                     catch(Exception e) {
-
+                        throw new Exception("Failure to combine range , ranges incompatible");
                     }
                 }
-                else {
-                    if(lastCombined != null) {
-                        newZipRangeList.getZipRangeList().add(new ZipRange(lastCombined));
+                else { //cannot combine adjacent ZipRanges
+
+                    if(lastCombined != null) { //we had already started a chain of combining
+                        returnZipRangeList.getZipRangeList().add(new ZipRange(lastCombined));
                     }
-                    else {
-                        newZipRangeList.getZipRangeList().add(new ZipRange(thisRange));
+                    else { //just add the current index
+                        returnZipRangeList.getZipRangeList().add(new ZipRange(thisRange));
                     }
+                    //reset last combined
                     lastCombined = null;
                 }
             }
-            else {
+            else { //didn't combine on last iteration, add last ZipRange to list as is
                 if(lastCombined == null) {
-                    newZipRangeList.getZipRangeList().add(new ZipRange(copiedList.getZipRangeList().get(i)));
+                    returnZipRangeList.getZipRangeList().add(new ZipRange(this.zipRangeList.get(i)));
                 }
             }
         }
 
-        if(lastCombined != null) {
-            newZipRangeList.getZipRangeList().add(new ZipRange(lastCombined));
+        if(lastCombined != null) { //hasn't been added yet if last act was to combine a range, add into return list
+            returnZipRangeList.getZipRangeList().add(new ZipRange(lastCombined));
         }
 
-        return newZipRangeList;
+        return returnZipRangeList;
     }
 
     public List<ZipRange> getZipRangeList() {
