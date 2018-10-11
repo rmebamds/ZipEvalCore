@@ -88,6 +88,7 @@ public class ZipRangeTests {
         //Cannot Combine With These
         ZipRange thatLowerLowLowerUpper = new ZipRange("[10000,10002]");
         ZipRange thatHigherLowerHigherUpper = new ZipRange("[15005,15555]");
+        ZipRange theNullZipRange = null;
 
         //Can Combine Assertions
         Assert.assertTrue(thisRange.canCombine(thatRangeTestCaseAllOutside));
@@ -98,6 +99,9 @@ public class ZipRangeTests {
         //Cannot combine assertions
         Assert.assertFalse(thisRange.canCombine(thatLowerLowLowerUpper));
         Assert.assertFalse(thisRange.canCombine(thatHigherLowerHigherUpper));
+
+        //Null combine
+        Assert.assertFalse(thisRange.canCombine(theNullZipRange));
     }
 
     @Test(expected = Exception.class)

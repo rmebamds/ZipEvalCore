@@ -1,0 +1,19 @@
+<component name="ArtifactManager">
+  <artifact name="ZipEvalCore:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/ZipEvalCore_jar</output-path>
+    <root id="root">
+      <element id="archive" name="ZipEvalCore.jar">
+        <element id="module-output" name="ZipEvalCore" />
+        <element id="module-test-output" name="ZipEvalCore" />
+      </element>
+      <element id="library" level="project" name="Maven: org.checkerframework:checker-qual:2.5.2" />
+      <element id="library" level="project" name="Maven: com.google.errorprone:error_prone_annotations:2.1.3" />
+      <element id="library" level="project" name="Maven: org.hamcrest:hamcrest-core:1.3" />
+      <element id="library" level="project" name="Maven: junit:junit:4.12" />
+      <element id="library" level="project" name="Maven: org.codehaus.mojo:animal-sniffer-annotations:1.14" />
+      <element id="library" level="project" name="Maven: com.google.code.findbugs:jsr305:3.0.2" />
+      <element id="library" level="project" name="Maven: com.google.guava:guava:26.0-jre" />
+      <element id="library" level="project" name="Maven: com.google.j2objc:j2objc-annotations:1.1" />
+    </root>
+  </artifact>
+</component>

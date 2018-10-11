@@ -81,7 +81,7 @@ public class ZipRange {
      * @return
      */
     public boolean canCombine(ZipRange thatRange) {
-        return thatRange.getUpperBound() >= this.getLowerBound() && thatRange.getLowerBound() <= this.getUpperBound();
+        return thatRange != null && thatRange.getUpperBound() >= this.getLowerBound() && thatRange.getLowerBound() <= this.getUpperBound();
     }
 
     /**
