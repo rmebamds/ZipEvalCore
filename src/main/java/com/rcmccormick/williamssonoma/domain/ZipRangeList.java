@@ -53,7 +53,7 @@ public class ZipRangeList {
 
     /**
      * Combine all internal ZipRanges into the equivalence class of condensed zip ranges, if possible
-     *  not destructive or mutative
+     *  not destructive or mutative.
      * @return - new copy of resulting list which is subset of this.zipRangeList
      */
     public ZipRangeList combine() throws Exception {
